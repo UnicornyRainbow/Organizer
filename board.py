@@ -3,8 +3,10 @@
 import os
 import datetime
 import gi
-gi.require_version('Gtk','3.0')
-from gi.repository import Gtk
+import sys
+gi.require_version('Gtk','4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw
 
 
 class Ticket(Gtk.Window):
@@ -81,10 +83,11 @@ class app():
 	def createTicket(title, topic, effort, priority, description):
 		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description}
 		id = str(datetime.datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
-		path = app.readConfig('Location of Tickets')
+		path = app.readConfig('Location of Tickets') + '/'
 		with open(path + id, 'w') as ticket:
 			for entry in content:
 				ticket.write(entry + ': ' + content[entry] + '\n')
+		#app.getTickets()
 	
 	#gets all the files in the current directory
 	def getTickets():
@@ -122,12 +125,17 @@ class app():
 					return(line[1])
 		return(allSettings)
 
-class window(Gtk.Window):
-	def __init__(self):
+class window(Gtk.ApplicationWindow):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)#'Codey', 960, 540, **kwargs)
+		
+		app3 = self.get_application()
+		sm = app3.get_style_manager()
+		sm.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+		
 		#window
 		Gtk.Window.__init__(self, title='Organizer')
-		self.set_border_width(10)
-		self.set_default_size(960, 540)
+		self.set_default_size(-1, 540)
 
 		
 		#Define the General structure of the Window
@@ -135,27 +143,29 @@ class window(Gtk.Window):
 		#Header Bar
 		self.headerBar = Gtk.HeaderBar()
 		self.set_titlebar(self.headerBar)
-		self.headerBar.set_show_close_button(True)
-		self.headerBar.props.title = 'Organizer'
+		self.headerBar.set_show_title_buttons(True)
+		self.title = Gtk.Label()
+		self.title.set_label('Organizer')
+		self.headerBar.set_title_widget(self.title)
 		
 		#Setup general window Structure
 		self.mainBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
-		self.add(self.mainBox)
+		self.set_child(self.mainBox)
 		
 		self.bigBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.mainBox.pack_start(self.bigBox, True, True, 0)
+		self.mainBox.append(self.bigBox)
 		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
-		self.bigBox.pack_start(self.titleBox, False, True, 0)
+		self.bigBox.append(self.titleBox)
 
 		#Scrollable box for the tickets
 		self.scrolledWindow = Gtk.ScrolledWindow()
 		self.scrolledWindow.set_vexpand(True)
 		self.scrolledWindow.set_hexpand(True)
-		self.bigBox.pack_start(self.scrolledWindow, True, True, 0)
+		self.bigBox.append(self.scrolledWindow)
 		
 		#Window For Ticket Details
 		self.detailBox = Gtk.Box()
-		self.mainBox.pack_end(self.detailBox, False, True, 0)
+		self.mainBox.prepend(self.detailBox)
 		
 
 
@@ -163,8 +173,8 @@ class window(Gtk.Window):
 
 		#Create new Ticket
 		self.newButton = Gtk.Button()
-		self.newIcon = Gtk.Image.new_from_icon_name("document-new-symbolic", Gtk.IconSize.MENU)
-		self.newButton.add(self.newIcon)
+		self.newIcon = Gtk.Image.new_from_icon_name("document-new-symbolic")
+		self.newButton.set_child(self.newIcon)
 		self.newButton.connect('clicked', self.newTicket)
 		self.headerBar.pack_start(self.newButton)
 
@@ -173,40 +183,38 @@ class window(Gtk.Window):
 		self.popover = Gtk.Popover()
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.menuButton = Gtk.MenuButton(popover=self.popover)
-		self.menuIcon = Gtk.Image.new_from_icon_name("open-menu-symbolic", Gtk.IconSize.MENU)
-		self.menuButton.add(self.menuIcon)
+		self.menuIcon = Gtk.Image.new_from_icon_name("open-menu-symbolic")
+		#self.menuButton.set_child(self.menuIcon)
 		self.headerBar.pack_end(self.menuButton)
 		#add a box to the Menu
 		self.menuBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-		self.popover.add(self.menuBox)
+		self.popover.set_child(self.menuBox)
 		#add Menu Items 
 		self.folderChooser = Gtk.Button()
-		self.folderIcon = Gtk.Image.new_from_icon_name('folder-open-symbolic', Gtk.IconSize.MENU)
-		self.folderChooser.add(self.folderIcon)
+		self.folderIcon = Gtk.Image.new_from_icon_name('folder-open-symbolic')
+		self.folderChooser.set_child(self.folderIcon)
 		self.folderChooser.connect('clicked', self.folderClicked)
-		self.menuBox.pack_start(self.folderChooser, False, True, 10)
+		self.menuBox.append(self.folderChooser)
 
-		#add all the Menu items and show them 
-		self.menuBox.show_all()
 		
 		#Ticket Boxes
 		self.ticketBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
-		self.scrolledWindow.add(self.ticketBox)
+		self.scrolledWindow.set_child(self.ticketBox)
 		self.idea = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
 		self.idea.set_size_request(143, -1)
-		self.ticketBox.pack_start(self.idea, True, True, 0)
+		self.ticketBox.append(self.idea)
 		self.todo = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
 		self.todo.set_size_request(143, -1)
-		self.ticketBox.pack_start(self.todo, True, True, 0)
+		self.ticketBox.append(self.todo)
 		self.inProgress = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
 		self.inProgress.set_size_request(143, -1)
-		self.ticketBox.pack_start(self.inProgress, True, True, 0)
+		self.ticketBox.append(self.inProgress)
 		self.onHold = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
 		self.onHold.set_size_request(143, -1)
-		self.ticketBox.pack_start(self.onHold, True, True, 0)
+		self.ticketBox.append(self.onHold)
 		self.done = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
 		self.done.set_size_request(143, -1)
-		self.ticketBox.pack_start(self.done, True, True, 0)
+		self.ticketBox.append(self.done)
 		
 		#Title of Ticket Categories
 		self.ideaLabel = Gtk.Label()
@@ -220,73 +228,68 @@ class window(Gtk.Window):
 		self.doneLabel = Gtk.Label()
 		self.doneLabel.set_markup('<big><b>Done</b></big>')
 		
-		self.titleBox.pack_start(self.ideaLabel, True, True, 0)
+		self.titleBox.append(self.ideaLabel)
 		self.ideaLabel.set_size_request(143, -1)
-		self.titleBox.pack_start(self.todoLabel, True, True, 0)
+		self.titleBox.append(self.todoLabel)
 		self.todoLabel.set_size_request(143, -1)
-		self.titleBox.pack_start(self.inProgressLabel, True, True, 0)
+		self.titleBox.append(self.inProgressLabel)
 		self.inProgressLabel.set_size_request(143, -1)
-		self.titleBox.pack_start(self.onHoldLabel, True, True, 0)
+		self.titleBox.append(self.onHoldLabel)
 		self.onHoldLabel.set_size_request(143, -1)
-		self.titleBox.pack_start(self.doneLabel, True, True, 0)
+		self.titleBox.append(self.doneLabel)
 		self.doneLabel.set_size_request(143, -1)
-		
-		
-		#a Ticket
-		#newTicket = Ticket('Title', 'Topic', '10', '2')
-		#self.idea.add(newTicket.frame)
-		
-		
 		
 		
 		
 	#opens dialog to choose folder to look in
 	def folderClicked(self, widget):
 		dialog = Gtk.FileChooserDialog(title='Select a Folder', action=Gtk.FileChooserAction.SELECT_FOLDER)
-		dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, 'Open', Gtk.ResponseType.OK)
-		response = dialog.run()
-		if response == Gtk.ResponseType.OK:
-			app.setConfig('Target_Path', dialog.get_filename())
-		dialog.destroy()
+		dialog.set_transient_for(self)
+		dialog.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Open', Gtk.ResponseType.OK)
+		dialog.connect('response', self.on_dialog_response)
+		dialog.show()
+		
+	def on_dialog_response(self, widget, response_id):
+		if response_id == Gtk.ResponseType.OK:
+			app.setConfig('Location of Tickets', widget.get_file().get_path())
+		widget.destroy()
+		
 		
 	#creates new Ticket
 	def newTicket(self, widget):
 		dialog = ticketDialog(self)
-		response = dialog.run()
-		if response == Gtk.ResponseType.OK:
-			app.createTicket(dialog.title.get_text(), dialog.topic.get_text(), dialog.effort.get_text(), dialog.priority.get_text(), dialog.description.get_text())
-			#newTicket = Ticket(dialog.title.get_text(), dialog.topic.get_text(), dialog.effort.get_text(), dialog.priority.get_text())
-			#self.todo.add(newTicket.frame)
-			#self.todo.show_all()
-		dialog.destroy()
+		dialog.connect('response', self.on_ticket_response)
+		
+	def on_ticket_response(self, widget, response_id):
+		if response_id == Gtk.ResponseType.OK:
+			app.createTicket(widget.title.get_text(), widget.topic.get_text(), widget.effort.get_text(), widget.priority.get_text(), widget.description.get_text())
+		widget.destroy()
 		
 class ticketDialog(Gtk.Dialog):
 	def __init__(self, parent):
-		Gtk.Dialog.__init__(self, 'New Ticket', parent, modal = True)
-		self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, 'Create', Gtk.ResponseType.OK)
-		#Gtk.StyleContext.add_class(self.get_action_area().get_style_context(), "linked")
-		self.set_default_size(600, -1)
-		self.set_border_width(3)
+		Gtk.Dialog.__init__(self)
+		self.set_transient_for(parent)
+		self.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Create', Gtk.ResponseType.OK)
 		self.content = self.get_content_area()
 		self.contentBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.contentBox.set_border_width(10)
-		self.content.add(self.contentBox)
+		#self.contentBox.set_border_width(10)
+		self.content.append(self.contentBox)
 		self.title = Gtk.Entry()
 		self.title.set_placeholder_text('Title')
-		self.contentBox.pack_start(self.title, False, True, 0)
+		self.contentBox.append(self.title)
 		self.topic = Gtk.Entry()
 		self.topic.set_placeholder_text('Topic')
-		self.contentBox.pack_start(self.topic, False, True, 0)
+		self.contentBox.append(self.topic)
 		self.effort = Gtk.Entry()
 		self.effort.set_placeholder_text('Estimated Effort')
-		self.contentBox.pack_start(self.effort, False, True, 0)
+		self.contentBox.append(self.effort)
 		self.priority = Gtk.Entry()
 		self.priority.set_placeholder_text('Priority')
-		self.contentBox.pack_start(self.priority, False, True, 0)
+		self.contentBox.append(self.priority)
 		self.description = Gtk.Entry()
 		self.description.set_placeholder_text('Enter a Description')
-		self.contentBox.pack_start(self.description, True, True, 0)
-		self.show_all()
+		self.contentBox.append(self.description)
+		self.show()
 		
 		
 	#move ticket with dropdown
@@ -297,13 +300,19 @@ class ticketDialog(Gtk.Dialog):
 	#setting for topic and choose them via dropdown
 	#setting to choose where tickets saved
 
-		
-		
+class MyApp(Adw.Application):
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.connect('activate', self.on_activate)
 
+	def on_activate(self, app):
+		self.win = window(application = app)
+		self.win.present()
+	
 
-
-window = window()
-window.connect('delete-event', Gtk.main_quit)
-window.show_all()
-Gtk.main()
-
+#window = window()
+#window.connect('delete-event', Gtk.main_quit)
+#window.show_all()
+#Gtk.main()
+app2=MyApp(application_id='org.Unicorn.Codey')
+app2.run(sys.argv)
