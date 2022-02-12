@@ -314,5 +314,5 @@ class MyApp(Adw.Application):
 #window.connect('delete-event', Gtk.main_quit)
 #window.show_all()
 #Gtk.main()
-app2=MyApp(application_id='org.Unicorn.Codey')
+app2=MyApp(application_id='org.Unicorn.Organizer')
 app2.run(sys.argv)
