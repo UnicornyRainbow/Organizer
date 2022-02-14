@@ -9,29 +9,31 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw
 
 
-class Ticket(Gtk.Window):
+class Ticket(Gtk.ApplicationWindow):
 	def __init__(self, title, topic, effort, priority):
 		self.frame = Gtk.Frame()
-		self.frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
 		self.box = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 0)
-		self.box.set_border_width(10)
 		
 		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.title = Gtk.Label()
 		self.title.set_label(title)
-		self.titleBox.pack_start(self.title, False, True, 0)
+		self.titleBox.append(self.title)
 		self.topicBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.topic = Gtk.Label()
 		self.topic.set_label(topic)
-		self.topicBox.pack_start(self.topic, False, True, 0)
-		self.valBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
+		self.topicBox.append(self.topic)
+		self.valBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL,homogeneous = True)
 		self.effort = Gtk.Label()
 		self.effort.set_label(effort)
+		self.effortBox = Gtk.Box()
+		self.effortBox.append(self.effort)
 		self.priority = Gtk.Label()
 		self.priority.set_label(priority)
+		self.priorityBox = Gtk.Box()
+		self.priorityBox.append(self.priority)
 		
-		self.valBox.pack_start(self.effort, False, True, 0)
-		self.valBox.pack_end(self.priority, False, True, 0)
+		self.valBox.append(self.effortBox)
+		self.valBox.prepend(self.priorityBox)
 		
 		self.statusBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
 		self.status = Gtk.ComboBoxText()
@@ -41,15 +43,15 @@ class Ticket(Gtk.Window):
 		self.status.append_text('On Hold/Waiting')
 		self.status.append_text('Done')
 		self.status.connect('changed', self.moveTo)
-		self.statusBox.pack_start(self.status, True, True, 0)
+		self.statusBox.append(self.status)
 		
-		self.box.add(self.titleBox)
-		self.box.add(self.topicBox)
-		self.box.add(self.valBox)
-		self.box.add(self.statusBox)
-		self.frame.add(self.box)
+		self.box.append(self.titleBox)
+		self.box.append(self.topicBox)
+		self.box.append(self.valBox)
+		self.box.append(self.statusBox)
+		self.frame.set_child(self.box)
 		
-		#self.idea.add(self.box)
+		#window.idea.add(self.box)
 		
 	def moveTo(self, widget):
 		file = widget.get_active_text()
@@ -68,7 +70,7 @@ class Ticket(Gtk.Window):
 		pass
 		
 	def setFile(self):
-		pass
+		return
 		
 	def setDescription(self):
 		pass
@@ -87,7 +89,11 @@ class app():
 		with open(path + id, 'w') as ticket:
 			for entry in content:
 				ticket.write(entry + ': ' + content[entry] + '\n')
-		#app.getTickets()
+		#app.refreshTickets()
+		
+	def refreshTickets():
+		fileList = app.getTickets()
+		
 	
 	#gets all the files in the current directory
 	def getTickets():
@@ -99,7 +105,7 @@ class app():
 					if entry.name.endswith('.ticket') and not entry.name.startswith('.'):
 						fileList.append(entry.name)
 			
-		print(fileList)				
+		print(fileList)
 		#return fileList
 		
 	#writes the config
@@ -239,6 +245,8 @@ class window(Gtk.ApplicationWindow):
 		self.titleBox.append(self.doneLabel)
 		self.doneLabel.set_size_request(143, -1)
 		
+		self.newticket = Ticket('title', 'topic', '10', '1')
+		self.todo.append(self.newticket.frame)
 		
 		
 	#opens dialog to choose folder to look in
