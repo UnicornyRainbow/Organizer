@@ -10,8 +10,12 @@ from gi.repository import Gtk, Adw
 
 
 class Ticket(Gtk.ApplicationWindow):
-	def __init__(self, title, topic, effort, priority):
+	def __init__(self, title, topic, effort, priority, filename):
+	
+		self.filename=filename
+	
 		self.frame = Gtk.Frame()
+		self.frame.set_name(filename)
 		self.box = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 2)
 		self.box.set_margin_top(3)
 		
@@ -46,7 +50,6 @@ class Ticket(Gtk.ApplicationWindow):
 		self.status.append_text('In Progress')
 		self.status.append_text('On Hold/Waiting')
 		self.status.append_text('Done')
-		self.status.connect('changed', self.moveTo)
 		self.statusBox.append(self.status)
 		
 		self.box.append(self.titleBox)
@@ -56,14 +59,6 @@ class Ticket(Gtk.ApplicationWindow):
 		self.frame.set_child(self.box)
 		
 		
-	def moveTo(self, widget):
-		file = widget.get_active_text()
-		#if file not 'Done':
-		#	print('not Done')
-			
-		
-		#elif file == 'Done':
-		#	pass
 		
 	def getFile(self):
 		pass
@@ -83,7 +78,6 @@ class app():
 	
 	#creates a new Ticket
 	def createTicket(title='', topic='', effort='', priority='', description=''):
-		print(title+topic+effort+priority+description)
 		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea'}
 		id = str(datetime.datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
 		path = app.readConfig('Location of Tickets') + '/'
@@ -91,10 +85,7 @@ class app():
 			for entry in content:
 				ticket.write(entry + ': ' + content[entry] + '\n')
 		
-	def refreshTickets():
-		fileList = app.getTickets()
 		
-	
 	#gets all the files in the current directory
 	def getTickets():
 		path = app.readConfig('Location of Tickets')
@@ -116,6 +107,22 @@ class app():
 				dict[line[0]] = line[1]
 		return dict
 		
+	def editTicket(file, setting, content):
+		allSettings = app.readTicket(file)
+		for settings in allSettings:
+			if settings[0] == setting:
+				settings[1] = content
+		with open(app.readConfig('Location of Tickets')+'/'+file, 'w') as ticket:
+			for settings in allSettings:
+				ticket.write(': '.join(settings) + '\n')
+		
+	def readTicket(file):
+		allSettings = []
+		with open(app.readConfig('Location of Tickets')+'/'+file, 'r') as ticket:
+			for line in ticket:
+				line = line.strip('\n').split(': ')
+				allSettings.append(line)
+		return(allSettings)
 		
 	#writes the config
 	def setConfig(setting, content):
@@ -133,7 +140,7 @@ class app():
 		allSettings = []
 		with open(os.path.dirname(__file__)+'/Organizer.config', 'r') as config:
 			for line in config:
-				line = line.strip().split(': ')
+				line = line.strip('\n').split(': ')
 				if setting == 'allSettings':
 					allSettings.append(line)
 				elif line[0] == setting:
@@ -196,7 +203,7 @@ class window(Gtk.ApplicationWindow):
 		#Button to test functions
 		self.testButton = Gtk.Button()
 		self.testButton.set_label('test')
-		self.testButton.connect('clicked', self.reloadTickets)
+		self.testButton.connect('clicked', self.tester)
 		self.headerBar.pack_start(self.testButton)
 
 		#Hamburger Menu
@@ -265,6 +272,16 @@ class window(Gtk.ApplicationWindow):
 		self.getTickets()
 		
 		
+	def tester(self, widget):
+		print(self)
+		
+		
+	def moveTicket(self, widget):
+		self.category = widget.get_active_text()
+		self.ticket = widget.get_parent().get_parent().get_parent()
+		app.editTicket(self.ticket.get_name(), 'Position', self.category)
+		self.reloadTickets()
+		
 	#opens dialog to choose folder to look in
 	def folderClicked(self, widget):
 		dialog = Gtk.FileChooserDialog(title='Select a Folder', action=Gtk.FileChooserAction.SELECT_FOLDER)
@@ -282,17 +299,27 @@ class window(Gtk.ApplicationWindow):
 		files = app.getTickets()
 		for file in files:
 			content = app.getTicketContent(file)
-			self.newticket = Ticket(content['Title'], content['Topic'], content['Effort'], content['Priority'])
+			self.newticket = Ticket(content['Title'], content['Topic'], content['Effort'], content['Priority'], file)
 			if content['Position'] == 'Idea':
+				self.newticket.status.set_active(0)
 				self.idea.append(self.newticket.frame)
+				self.newticket.status.connect('changed', self.moveTicket)
 			if content['Position'] == 'To Do':
+				self.newticket.status.set_active(1)
 				self.todo.append(self.newticket.frame)
+				self.newticket.status.connect('changed', self.moveTicket)
 			if content['Position'] == 'In Progress':
+				self.newticket.status.set_active(2)
 				self.inProgress.append(self.newticket.frame)
+				self.newticket.status.connect('changed', self.moveTicket)
 			if content['Position'] == 'On Hold/Waiting':
+				self.newticket.status.set_active(3)
 				self.onHold.append(self.newticket.frame)
+				self.newticket.status.connect('changed', self.moveTicket)
 			if content['Position'] == 'Done':
+				self.newticket.status.set_active(4)
 				self.done.append(self.newticket.frame)
+				self.newticket.status.connect('changed', self.moveTicket)
 			
 			
 	def reloadTickets(self):
