@@ -8,7 +8,7 @@ from gi.repository import Gtk, Adw
 import backend
 import more_ui
 from backend import app
-from more_ui import Ticket, ticketDialog
+from more_ui import Ticket, ticketDialog, ticketDetails
 
 class window(Gtk.ApplicationWindow):
 	def __init__(self, *args, **kwargs):
@@ -22,7 +22,7 @@ class window(Gtk.ApplicationWindow):
 		
 		#window
 		Gtk.Window.__init__(self, title='Organizer')
-		self.set_default_size(-1, 540)
+		self.set_default_size(960, 540)
 
 		
 		#Define the General structure of the Window
@@ -36,25 +36,24 @@ class window(Gtk.ApplicationWindow):
 		self.headerBar.set_title_widget(self.title)
 		
 		#Setup general window Structure
-		self.mainBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
+		self.mainBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.set_child(self.mainBox)
 		
-		self.bigBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
-		self.bigBox.set_margin_start(self.spacing)
-		self.bigBox.set_margin_end(self.spacing)
-		self.bigBox.set_margin_top(self.spacing)
-		self.bigBox.set_margin_bottom(self.spacing)
+		#Box for Ticket columns and Headers
+		self.bigBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, margin_start = self.spacing, margin_end = self.spacing, margin_top = self.spacing, margin_bottom = self.spacing)
 		self.mainBox.append(self.bigBox)
 		self.testbox = Gtk.ScrolledWindow()
 		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
 		self.bigBox.append(self.titleBox)
-
 		#Scrollable box for the tickets
-		self.scrolledWindow = Gtk.ScrolledWindow()
-		self.scrolledWindow.set_vexpand(True)
-		self.scrolledWindow.set_hexpand(True)
-		self.bigBox.append(self.scrolledWindow)
+		self.ticketScroll = Gtk.ScrolledWindow(vexpand = True, hexpand = True)
+		self.bigBox.append(self.ticketScroll)
 		
+		#Box for Ticket Details
+		self.detailScroll = Gtk.ScrolledWindow(vexpand = True, hexpand = True, margin_start = self.spacing, margin_end = self.spacing, margin_top = self.spacing, margin_bottom = self.spacing)
+		self.detailScroll.set_size_request(380, -1)
+		self.detailBox = Gtk.Box(vexpand = True, hexpand = True, orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
+		self.detailScroll.set_child(self.detailBox)
 		
 		
 
@@ -68,82 +67,68 @@ class window(Gtk.ApplicationWindow):
 		self.headerBar.pack_start(self.newButton)
 
 		#Button to test functions
-		self.testButton = Gtk.Button()
-		self.testButton.set_label('test')
+		self.testButton = Gtk.Button(label = 'test')
 		self.testButton.connect('clicked', self.tester)
 		self.headerBar.pack_start(self.testButton)
 
 		#Hamburger Menu
 		#Popover and Button
-		self.popover = Gtk.Popover()
-		self.popover.set_position(Gtk.PositionType.BOTTOM)
+		self.popover = Gtk.Popover(position = Gtk.PositionType.BOTTOM)
 		self.menuButton = Gtk.MenuButton(popover=self.popover)
-		self.menuIcon = Gtk.Image.new_from_icon_name("open-menu-symbolic")
-		#self.menuButton.set_child(self.menuIcon)
 		self.headerBar.pack_end(self.menuButton)
 		#add a box to the Menu
 		self.menuBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=self.spacing)
 		self.popover.set_child(self.menuBox)
 		#add Menu Items 
-		self.folderChooser = Gtk.Button()
-		self.folderIcon = Gtk.Image.new_from_icon_name('folder-open-symbolic')
-		self.folderChooser.set_child(self.folderIcon)
+		self.folderChooser = Gtk.Button(label = 'Select Board')
+		#self.folderIcon = Gtk.Image.new_from_icon_name('folder-open-symbolic')
+		#self.folderChooser.set_child(self.folderIcon)
 		self.folderChooser.connect('clicked', self.folderClicked)
 		self.menuBox.append(self.folderChooser)
 
 		
 		#Ticket Boxes
-		self.columnWidth = 180#118
+		self.columnWidth = 100
 		self.ticketBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing, homogeneous = True)
-		self.scrolledWindow.set_child(self.ticketBox)
-		self.idea = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.ticketScroll.set_child(self.ticketBox)
+		self.idea = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, hexpand = True)
 		self.idea.set_size_request(self.columnWidth, -1)
-		self.idea.set_hexpand(True)
 		self.ticketBox.append(self.idea)
-		self.todo = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.todo = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, hexpand = True)
 		self.todo.set_size_request(self.columnWidth, -1)
-		self.todo.set_hexpand(True)
 		self.ticketBox.append(self.todo)
-		self.inProgress = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
-		self.inProgress.set_size_request(self.columnWidth, -1)
-		self.inProgress.set_hexpand(True)
-		self.ticketBox.append(self.inProgress)
-		self.stopped = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.doing = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, hexpand = True)
+		self.doing.set_size_request(self.columnWidth, -1)
+		self.ticketBox.append(self.doing)
+		self.stopped = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, hexpand = True)
 		self.stopped.set_size_request(self.columnWidth, -1)
-		self.stopped.set_hexpand(True)
 		self.ticketBox.append(self.stopped)
-		self.done = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.done = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing, hexpand = True)
 		self.done.set_size_request(self.columnWidth, -1)
-		self.done.set_hexpand(True)
 		self.ticketBox.append(self.done)
 		
 		#Title of Ticket Categories
-		self.ideaLabel = Gtk.Label()
+		self.ideaLabel = Gtk.Label(hexpand = True)
 		self.ideaLabel.set_markup('<big><b>Idea</b></big>')
-		self.todoLabel = Gtk.Label()
+		self.todoLabel = Gtk.Label(hexpand = True)
 		self.todoLabel.set_markup('<big><b>To Do</b></big>')
-		self.inProgressLabel = Gtk.Label()
-		self.inProgressLabel.set_markup('<big><b>In Progress</b></big>')
-		self.stoppedLabel = Gtk.Label()
+		self.doingLabel = Gtk.Label(hexpand = True)
+		self.doingLabel.set_markup('<big><b>Doing</b></big>')
+		self.stoppedLabel = Gtk.Label(hexpand = True)
 		self.stoppedLabel.set_markup('<big><b>Stopped</b></big>')
-		self.doneLabel = Gtk.Label()
+		self.doneLabel = Gtk.Label(hexpand = True)
 		self.doneLabel.set_markup('<big><b>Done</b></big>')
 		
 		self.titleBox.append(self.ideaLabel)
 		self.ideaLabel.set_size_request(self.columnWidth, -1)
-		self.ideaLabel.set_hexpand(True)
 		self.titleBox.append(self.todoLabel)
 		self.todoLabel.set_size_request(self.columnWidth, -1)
-		self.todoLabel.set_hexpand(True)
-		self.titleBox.append(self.inProgressLabel)
-		self.inProgressLabel.set_size_request(self.columnWidth, -1)
-		self.inProgressLabel.set_hexpand(True)
+		self.titleBox.append(self.doingLabel)
+		self.doingLabel.set_size_request(self.columnWidth, -1)
 		self.titleBox.append(self.stoppedLabel)
 		self.stoppedLabel.set_size_request(self.columnWidth, -1)
-		self.stoppedLabel.set_hexpand(True)
 		self.titleBox.append(self.doneLabel)
 		self.doneLabel.set_size_request(self.columnWidth, -1)
-		self.doneLabel.set_hexpand(True)
 		
 		#finally loads the Tickets for the first time
 		self.getTickets()
@@ -154,10 +139,20 @@ class window(Gtk.ApplicationWindow):
 		print(self)
 		
 	
-	def openTicket(self, widget):
-		self.detailBox = Gtk.Box()
-		self.detailBox.set_size_request(100, -1)
-		self.mainBox.append(self.detailBox)
+	def closeDetails(self, widget):
+		self.detailBox.remove(widget.get_parent().get_parent().get_parent())
+		if self.detailBox.get_first_child() == None:
+			self.mainBox.remove(self.detailScroll)
+	
+	def openDetails(self, widget):
+		if self.detailScroll.get_parent() == None:
+			self.mainBox.append(self.detailScroll)
+		file = widget.get_parent().get_parent().get_parent().get_name()
+		content = app.getTicketContent(file)
+		self.ticketDetails = ticketDetails(file, content['Title'], content['Topic'], content['Effort'], content['Priority'], content['Position'], content['Description'])
+		self.detailBox.append(self.ticketDetails.frame)
+		self.ticketDetails.status.connect('changed', self.moveTicket)
+		self.ticketDetails.close.connect('clicked', self.closeDetails)
 		
 	def moveTicket(self, widget):
 		self.category = widget.get_active_text()
@@ -189,9 +184,9 @@ class window(Gtk.ApplicationWindow):
 			elif content['Position'] == 'To Do':
 				self.newticket.status.set_active(1)
 				self.todo.append(self.newticket.frame)
-			elif content['Position'] == 'In Progress':
+			elif content['Position'] == 'Doing':
 				self.newticket.status.set_active(2)
-				self.inProgress.append(self.newticket.frame)
+				self.doing.append(self.newticket.frame)
 			elif content['Position'] == 'Stopped':
 				self.newticket.status.set_active(3)
 				self.stopped.append(self.newticket.frame)
@@ -199,7 +194,7 @@ class window(Gtk.ApplicationWindow):
 				self.newticket.status.set_active(4)
 				self.done.append(self.newticket.frame)
 			self.newticket.status.connect('changed', self.moveTicket)
-			self.newticket.titleButton.connect('clicked', self.openTicket)
+			self.newticket.titleButton.connect('clicked', self.openDetails)
 			
 			
 	def reloadTickets(self):
@@ -207,8 +202,8 @@ class window(Gtk.ApplicationWindow):
 			self.idea.remove(self.idea.get_first_child())
 		while self.todo.get_first_child():
 			self.todo.remove(self.todo.get_first_child())
-		while self.inProgress.get_first_child():
-			self.inProgress.remove(self.inProgress.get_first_child())
+		while self.doing.get_first_child():
+			self.doing.remove(self.doing.get_first_child())
 		while self.stopped.get_first_child():
 			self.stopped.remove(self.stopped.get_first_child())
 		while self.done.get_first_child():
@@ -220,6 +215,7 @@ class window(Gtk.ApplicationWindow):
 	def newTicket(self, widget):
 		dialog = ticketDialog(self)
 		dialog.connect('response', self.on_ticket_response)
+		
 	def on_ticket_response(self, widget, response_id):
 		if response_id == Gtk.ResponseType.OK:
 			app.createTicket(widget.title.get_text(), widget.topic.get_text(), widget.effort.get_text(), widget.priority.get_text(), widget.description.get_text())
