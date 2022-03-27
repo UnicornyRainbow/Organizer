@@ -49,6 +49,10 @@ class Ticket(Gtk.ApplicationWindow):
 		self.frame.set_child(self.box)
 		
 		
+class comment(Gtk.ApplicationWindow):
+	def __init__(self, comment)
+		
+		self.frame = Gtk.Frame()
 		
 		
 class ticketDetails(Gtk.ApplicationWindow):
@@ -67,6 +71,8 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.infoBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.valBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.descriptionBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
+		self.enterCommentBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
+		self.commentBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
 		
 		#Populate the Window
 		self.titleBox = Gtk.Box(hexpand = True)
@@ -93,6 +99,10 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.description = Gtk.Box(hexpand = True)
 		self.description.append(Gtk.Label(wrap = True, wrap_mode = 0, label = description))
 		
+		self.enterComment = Gtk.Entry(placeholder_text = 'Enter a Comment', hexpand = True)
+		self.submit = Gtk.Button(label = 'Submit')
+		self.submit.connect('clicked', self.submitComment)
+		
 		#Append everything
 		self.headerBox.append(self.titleBox)
 		self.headerBox.append(self.close)
@@ -103,11 +113,15 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.valBox.append(self.effort)
 		self.descriptionBox.append(self.descriptionHeader)
 		self.descriptionBox.append(self.description)
+		self.enterCommentBox.append(self.enterComment)
+		self.enterCommentBox.append(self.submit)
 		
 		self.box.append(self.headerBox)
 		self.box.append(self.infoBox)
 		self.box.append(self.valBox)
 		self.box.append(self.descriptionBox)
+		self.box.append(self.enterCommentBox)
+		self.box.append(self.commentBox)
 		self.frame.set_child(self.box)
 		
 	def setPosition(self, position):
@@ -122,7 +136,10 @@ class ticketDetails(Gtk.ApplicationWindow):
 		elif position == 'Done':
 			self.status.set_active(4)
 	
-	
+	def submitComment(self, widget):
+		print(self.enterComment.get_text())
+		self.commentBox.prepend(Gtk.Label(label = self.enterComment.get_text(), hexpand = True))
+		self.enterComment.set_text('')
 
 
 class ticketDialog(Gtk.Dialog):

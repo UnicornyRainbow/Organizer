@@ -7,8 +7,8 @@ import datetime
 class app():
 	
 	#creates a new Ticket
-	def createTicket(title='', topic='', effort='', priority='', description=''):
-		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea'}
+	def createTicket(title='', topic='', effort='', priority='', description='', comments=''):
+		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea', 'Comments': comments}
 		id = str(datetime.datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
 		path = app.readConfig('Location of Tickets') + '/'
 		with open(path + id, 'w') as ticket:
