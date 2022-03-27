@@ -11,23 +11,21 @@ from gi.repository import Gtk, Adw
 
 class Ticket(Gtk.ApplicationWindow):
 	def __init__(self, title, topic, effort, priority, filename):
-	
-		self.filename=filename
-	
+		
+		self.title = Gtk.Label(label = title, wrap = True, wrap_mode = 2)
+		self.topic = Gtk.Label(label = topic, wrap = True, wrap_mode = 2)
+		
 		self.frame = Gtk.Frame()
 		self.frame.set_name(filename)
 		self.box = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 2)
-		self.box.set_margin_top(3)
 		
 		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
-		self.titleBox.set_margin_start(3)
-		self.title = Gtk.Label()
-		self.title.set_label(title)
-		self.titleBox.append(self.title)
+		self.titleButton = Gtk.Button()
+		self.titleButton.set_hexpand(True)
+		self.titleButton.set_child(self.title)
+		self.titleBox.append(self.titleButton)
 		self.topicBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
 		self.topicBox.set_margin_start(3)
-		self.topic = Gtk.Label()
-		self.topic.set_label(topic)
 		self.topicBox.append(self.topic)
 		self.valBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL,homogeneous = True)
 		self.valBox.set_margin_start(3)
@@ -48,7 +46,7 @@ class Ticket(Gtk.ApplicationWindow):
 		self.status.append_text('Idea')
 		self.status.append_text('To Do')
 		self.status.append_text('In Progress')
-		self.status.append_text('On Hold/Waiting')
+		self.status.append_text('Stopped')
 		self.status.append_text('Done')
 		self.statusBox.append(self.status)
 		
@@ -57,21 +55,7 @@ class Ticket(Gtk.ApplicationWindow):
 		self.box.append(self.valBox)
 		self.box.append(self.statusBox)
 		self.frame.set_child(self.box)
-		
-		
-		
-	def getFile(self):
-		pass
-		
-	def setFile(self):
-		return
-		
-	def setDescription(self):
-		pass
-		
-	def setComment(self):
-		pass
-		
+
 
 
 class app():
@@ -155,6 +139,8 @@ class window(Gtk.ApplicationWindow):
 		sm = app3.get_style_manager()
 		sm.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
 		
+		self.spacing = 10
+		
 		#window
 		Gtk.Window.__init__(self, title='Organizer')
 		self.set_default_size(-1, 540)
@@ -171,12 +157,17 @@ class window(Gtk.ApplicationWindow):
 		self.headerBar.set_title_widget(self.title)
 		
 		#Setup general window Structure
-		self.mainBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
+		self.mainBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
 		self.set_child(self.mainBox)
 		
-		self.bigBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
+		self.bigBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.bigBox.set_margin_start(self.spacing)
+		self.bigBox.set_margin_end(self.spacing)
+		self.bigBox.set_margin_top(self.spacing)
+		self.bigBox.set_margin_bottom(self.spacing)
 		self.mainBox.append(self.bigBox)
-		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
+		self.testbox = Gtk.ScrolledWindow()
+		self.titleBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing)
 		self.bigBox.append(self.titleBox)
 
 		#Scrollable box for the tickets
@@ -185,11 +176,8 @@ class window(Gtk.ApplicationWindow):
 		self.scrolledWindow.set_hexpand(True)
 		self.bigBox.append(self.scrolledWindow)
 		
-		#Window For Ticket Details
-		self.detailBox = Gtk.Box()
-		#self.mainBox.append(self.detailBox)
 		
-
+		
 
 		#Populate the Header Bar
 
@@ -215,7 +203,7 @@ class window(Gtk.ApplicationWindow):
 		#self.menuButton.set_child(self.menuIcon)
 		self.headerBar.pack_end(self.menuButton)
 		#add a box to the Menu
-		self.menuBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+		self.menuBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=self.spacing)
 		self.popover.set_child(self.menuBox)
 		#add Menu Items 
 		self.folderChooser = Gtk.Button()
@@ -226,22 +214,28 @@ class window(Gtk.ApplicationWindow):
 
 		
 		#Ticket Boxes
-		self.ticketBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = 10)
+		self.columnWidth = 180#118
+		self.ticketBox = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL, spacing = self.spacing, homogeneous = True)
 		self.scrolledWindow.set_child(self.ticketBox)
-		self.idea = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.idea.set_size_request(160, -1)
+		self.idea = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.idea.set_size_request(self.columnWidth, -1)
+		self.idea.set_hexpand(True)
 		self.ticketBox.append(self.idea)
-		self.todo = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.todo.set_size_request(160, -1)
+		self.todo = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.todo.set_size_request(self.columnWidth, -1)
+		self.todo.set_hexpand(True)
 		self.ticketBox.append(self.todo)
-		self.inProgress = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.inProgress.set_size_request(160, -1)
+		self.inProgress = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.inProgress.set_size_request(self.columnWidth, -1)
+		self.inProgress.set_hexpand(True)
 		self.ticketBox.append(self.inProgress)
-		self.onHold = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.onHold.set_size_request(160, -1)
-		self.ticketBox.append(self.onHold)
-		self.done = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		self.done.set_size_request(160, -1)
+		self.stopped = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.stopped.set_size_request(self.columnWidth, -1)
+		self.stopped.set_hexpand(True)
+		self.ticketBox.append(self.stopped)
+		self.done = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = self.spacing)
+		self.done.set_size_request(self.columnWidth, -1)
+		self.done.set_hexpand(True)
 		self.ticketBox.append(self.done)
 		
 		#Title of Ticket Categories
@@ -251,30 +245,40 @@ class window(Gtk.ApplicationWindow):
 		self.todoLabel.set_markup('<big><b>To Do</b></big>')
 		self.inProgressLabel = Gtk.Label()
 		self.inProgressLabel.set_markup('<big><b>In Progress</b></big>')
-		self.onHoldLabel = Gtk.Label()
-		self.onHoldLabel.set_markup('<big><b>On Hold/Waiting</b></big>')
+		self.stoppedLabel = Gtk.Label()
+		self.stoppedLabel.set_markup('<big><b>Stopped</b></big>')
 		self.doneLabel = Gtk.Label()
 		self.doneLabel.set_markup('<big><b>Done</b></big>')
 		
 		self.titleBox.append(self.ideaLabel)
-		self.ideaLabel.set_size_request(160, -1)
+		self.ideaLabel.set_size_request(self.columnWidth, -1)
+		self.ideaLabel.set_hexpand(True)
 		self.titleBox.append(self.todoLabel)
-		self.todoLabel.set_size_request(160, -1)
+		self.todoLabel.set_size_request(self.columnWidth, -1)
+		self.todoLabel.set_hexpand(True)
 		self.titleBox.append(self.inProgressLabel)
-		self.inProgressLabel.set_size_request(160, -1)
-		self.titleBox.append(self.onHoldLabel)
-		self.onHoldLabel.set_size_request(160, -1)
+		self.inProgressLabel.set_size_request(self.columnWidth, -1)
+		self.inProgressLabel.set_hexpand(True)
+		self.titleBox.append(self.stoppedLabel)
+		self.stoppedLabel.set_size_request(self.columnWidth, -1)
+		self.stoppedLabel.set_hexpand(True)
 		self.titleBox.append(self.doneLabel)
-		self.doneLabel.set_size_request(160, -1)
+		self.doneLabel.set_size_request(self.columnWidth, -1)
+		self.doneLabel.set_hexpand(True)
 		
-		
-		#finally gets loads the Tickets for the first time
+		#finally loads the Tickets for the first time
 		self.getTickets()
+		
 		
 		
 	def tester(self, widget):
 		print(self)
 		
+	
+	def openTicket(self, widget):
+		self.detailBox = Gtk.Box()
+		self.detailBox.set_size_request(100, -1)
+		self.mainBox.append(self.detailBox)
 		
 	def moveTicket(self, widget):
 		self.category = widget.get_active_text()
@@ -303,23 +307,20 @@ class window(Gtk.ApplicationWindow):
 			if content['Position'] == 'Idea':
 				self.newticket.status.set_active(0)
 				self.idea.append(self.newticket.frame)
-				self.newticket.status.connect('changed', self.moveTicket)
-			if content['Position'] == 'To Do':
+			elif content['Position'] == 'To Do':
 				self.newticket.status.set_active(1)
 				self.todo.append(self.newticket.frame)
-				self.newticket.status.connect('changed', self.moveTicket)
-			if content['Position'] == 'In Progress':
+			elif content['Position'] == 'In Progress':
 				self.newticket.status.set_active(2)
 				self.inProgress.append(self.newticket.frame)
-				self.newticket.status.connect('changed', self.moveTicket)
-			if content['Position'] == 'On Hold/Waiting':
+			elif content['Position'] == 'Stopped':
 				self.newticket.status.set_active(3)
-				self.onHold.append(self.newticket.frame)
-				self.newticket.status.connect('changed', self.moveTicket)
-			if content['Position'] == 'Done':
+				self.stopped.append(self.newticket.frame)
+			elif content['Position'] == 'Done':
 				self.newticket.status.set_active(4)
 				self.done.append(self.newticket.frame)
-				self.newticket.status.connect('changed', self.moveTicket)
+			self.newticket.status.connect('changed', self.moveTicket)
+			self.newticket.titleButton.connect('clicked', self.openTicket)
 			
 			
 	def reloadTickets(self):
@@ -329,8 +330,8 @@ class window(Gtk.ApplicationWindow):
 			self.todo.remove(self.todo.get_first_child())
 		while self.inProgress.get_first_child():
 			self.inProgress.remove(self.inProgress.get_first_child())
-		while self.onHold.get_first_child():
-			self.onHold.remove(self.onHold.get_first_child())
+		while self.stopped.get_first_child():
+			self.stopped.remove(self.stopped.get_first_child())
 		while self.done.get_first_child():
 			self.done.remove(self.done.get_first_child())
 		self.getTickets()
@@ -353,10 +354,12 @@ class ticketDialog(Gtk.Dialog):
 		self.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Create', Gtk.ResponseType.OK)
 		self.content = self.get_content_area()
 		self.contentBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10)
-		#self.contentBox.set_border_width(10)
 		self.content.append(self.contentBox)
+		self.contentBox.set_hexpand(True)
+		self.contentBox.set_vexpand(True)
 		self.title = Gtk.Entry()
 		self.title.set_placeholder_text('Title')
+		self.title.set_max_length(100)
 		self.contentBox.append(self.title)
 		self.topic = Gtk.Entry()
 		self.topic.set_placeholder_text('Topic')
@@ -369,14 +372,11 @@ class ticketDialog(Gtk.Dialog):
 		self.contentBox.append(self.priority)
 		self.description = Gtk.Entry()
 		self.description.set_placeholder_text('Enter a Description')
+		self.description.set_vexpand(True)
 		self.contentBox.append(self.description)
 		self.show()
 		
 	
-	#move ticket with dropdown
-	#click Ticket to open details in side window
-	#add comments
-	#setting for topic and choose them via dropdown
 
 class MyApp(Adw.Application):
 	def __init__(self, **kwargs):
@@ -391,3 +391,17 @@ class MyApp(Adw.Application):
 
 app2=MyApp(application_id='org.Unicorn.Organizer')
 app2.run(sys.argv)
+
+	
+#click Ticket to open details in side window Detail Window
+	#close button
+	#change position
+	#show infos(title, topic, description etc...)
+	#show Ticket id?
+	#add comments
+	#edit previously entered values
+	#Button to delete Ticket
+#setting for topic and choose them via dropdown
+#delete old Tickets(maybe only on startup?)
+	#dont really delete them, make hidden files
+	#setting when to delete
