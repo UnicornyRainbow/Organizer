@@ -50,9 +50,12 @@ class Ticket(Gtk.ApplicationWindow):
 		
 		
 class comment(Gtk.ApplicationWindow):
-	def __init__(self, comment)
+	def __init__(self, comment):
 		
 		self.frame = Gtk.Frame()
+		self.box = Gtk.Box(margin_start = 5, margin_end = 5)
+		self.box.append(Gtk.Label(label = comment, wrap = True, wrap_mode = 2))
+		self.frame.set_child(self.box)
 		
 		
 class ticketDetails(Gtk.ApplicationWindow):
@@ -115,6 +118,7 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.descriptionBox.append(self.description)
 		self.enterCommentBox.append(self.enterComment)
 		self.enterCommentBox.append(self.submit)
+		self.getComments()
 		
 		self.box.append(self.headerBox)
 		self.box.append(self.infoBox)
@@ -137,19 +141,40 @@ class ticketDetails(Gtk.ApplicationWindow):
 			self.status.set_active(4)
 	
 	def submitComment(self, widget):
-		print(self.enterComment.get_text())
-		self.commentBox.prepend(Gtk.Label(label = self.enterComment.get_text(), hexpand = True))
+		self.enteredComment = self.enterComment.get_text()
+		if self.enteredComment == '':
+			return
+		self.comment = comment(self.enteredComment)
+		self.commentBox.prepend(self.comment.frame)
+		self.comments = app.getTicketContent(self.frame.get_name())['Comments']
+		self.comments = self.comments.split('|')
+		print(self.comments)
+		self.comments.append(self.enteredComment)
+		print(self.comments)
+		self.comments = '|'.join(self.comments)
+		print(self.comments)
+		app.editTicket(self.frame.get_name(), 'Comments', self.comments)
 		self.enterComment.set_text('')
+		
+	def getComments(self):
+		self.comments = app.getTicketContent(self.frame.get_name())['Comments']
+		self.comments = self.comments.split('|')
+		for item in self.comments:
+			self.comment = comment(item)
+			self.commentBox.prepend(self.comment.frame)
+		
+		
 
 
 class ticketDialog(Gtk.Dialog):
 	def __init__(self, parent):
 		Gtk.Dialog.__init__(self)
 		self.set_transient_for(parent)
+		self.set_default_size(300, 400)
 		self.set_modal(True)
 		self.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Create', Gtk.ResponseType.OK)
 		self.content = self.get_content_area()
-		self.contentBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 10, hexpand = True, vexpand = True)
+		self.contentBox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL, spacing = 5, hexpand = True, vexpand = True, margin_top = 5, margin_start = 5, margin_end = 5)
 		self.content.append(self.contentBox)
 		self.title = Gtk.Entry(placeholder_text = 'Title')
 		self.contentBox.append(self.title)
@@ -159,6 +184,9 @@ class ticketDialog(Gtk.Dialog):
 		self.contentBox.append(self.effort)
 		self.priority = Gtk.Entry(placeholder_text = 'Priority')
 		self.contentBox.append(self.priority)
-		self.description = Gtk.Entry(placeholder_text = 'Enter a Description', vexpand = True)
-		self.contentBox.append(self.description)
+		self.frame = Gtk.Frame()
+		self.description = Gtk.TextView(vexpand = True, left_margin = 5, right_margin = 5, accepts_tab = False)
+		self.description.set_wrap_mode(2)
+		self.frame.set_child(self.description)
+		self.contentBox.append(self.frame)
 		self.show()

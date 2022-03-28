@@ -136,7 +136,7 @@ class window(Gtk.ApplicationWindow):
 		
 		
 	def tester(self, widget):
-		print(self)
+		app.editTicket('2022-02-18_07:59:12_130398.ticket', 'Topic', 'test')
 		
 	
 	def closeDetails(self, widget):
@@ -218,6 +218,7 @@ class window(Gtk.ApplicationWindow):
 		
 	def on_ticket_response(self, widget, response_id):
 		if response_id == Gtk.ResponseType.OK:
-			app.createTicket(widget.title.get_text(), widget.topic.get_text(), widget.effort.get_text(), widget.priority.get_text(), widget.description.get_text())
+			desc = widget.description.get_buffer().get_text(widget.description.get_buffer().get_start_iter(), widget.description.get_buffer().get_end_iter(), False)
+			app.createTicket(widget.title.get_text(), widget.topic.get_text(), widget.effort.get_text(), widget.priority.get_text(), desc)
 			self.reloadTickets()
 		widget.destroy()

@@ -8,6 +8,7 @@ class app():
 	
 	#creates a new Ticket
 	def createTicket(title='', topic='', effort='', priority='', description='', comments=''):
+		description = description.replace('\n', '\\n')
 		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea', 'Comments': comments}
 		id = str(datetime.datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
 		path = app.readConfig('Location of Tickets') + '/'
@@ -27,30 +28,43 @@ class app():
 						fileList.append(entry.name)
 		return fileList
 	
-	#reads the contents in a ticket file
+	#reads the contents in a ticket file, good to get certain items
 	def getTicketContent(file):
 		dict={}
 		path = app.readConfig('Location of Tickets')
 		with open(path+'/'+file) as ticket:
 			for line in ticket:
 				line = line.strip('\n').split(': ')
+				if len(line) > 2:
+					line[1] = ': '.join(line[1:])
+					del line[2:]
+				if line[0] == 'Description':
+					line[1] = line[1].replace('\\n', '\n')
 				dict[line[0]] = line[1]
 		return dict
 		
 	def editTicket(file, setting, content):
 		allSettings = app.readTicket(file)
+		if setting == 'Description':
+			content = content.replace('\n', '\\n')
 		for settings in allSettings:
 			if settings[0] == setting:
 				settings[1] = content
 		with open(app.readConfig('Location of Tickets')+'/'+file, 'w') as ticket:
 			for settings in allSettings:
 				ticket.write(': '.join(settings) + '\n')
-		
+
+	#needed to edit ticket
 	def readTicket(file):
 		allSettings = []
 		with open(app.readConfig('Location of Tickets')+'/'+file, 'r') as ticket:
 			for line in ticket:
 				line = line.strip('\n').split(': ')
+				if len(line) > 2:
+					line[1] = ': '.join(line[1:])
+					del line[2:]
+				if line[0] == 'Description':
+					line[1] = line[1].replace('\\n', '\n')
 				allSettings.append(line)
 		return(allSettings)
 		
