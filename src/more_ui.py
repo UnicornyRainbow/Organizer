@@ -147,12 +147,12 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.comment = comment(self.enteredComment)
 		self.commentBox.prepend(self.comment.frame)
 		self.comments = app.getTicketContent(self.frame.get_name())['Comments']
-		self.comments = self.comments.split('|')
-		print(self.comments)
+		if self.comments == '':
+			self.comments = []
+		else:
+			self.comments = self.comments.split('|')
 		self.comments.append(self.enteredComment)
-		print(self.comments)
 		self.comments = '|'.join(self.comments)
-		print(self.comments)
 		app.editTicket(self.frame.get_name(), 'Comments', self.comments)
 		self.enterComment.set_text('')
 		
@@ -160,6 +160,8 @@ class ticketDetails(Gtk.ApplicationWindow):
 		self.comments = app.getTicketContent(self.frame.get_name())['Comments']
 		self.comments = self.comments.split('|')
 		for item in self.comments:
+			if item == '':
+				return
 			self.comment = comment(item)
 			self.commentBox.prepend(self.comment.frame)
 		

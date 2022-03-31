@@ -45,11 +45,11 @@ class app():
 		
 	def editTicket(file, setting, content):
 		allSettings = app.readTicket(file)
-		if setting == 'Description':
-			content = content.replace('\n', '\\n')
 		for settings in allSettings:
 			if settings[0] == setting:
 				settings[1] = content
+			if settings[0] == 'Description':
+				settings[1] = settings[1].replace('\n', '\\n')
 		with open(app.readConfig('Location of Tickets')+'/'+file, 'w') as ticket:
 			for settings in allSettings:
 				ticket.write(': '.join(settings) + '\n')
