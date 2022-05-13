@@ -7,6 +7,8 @@ from gi.repository import Adw
 
 import window
 from window import window
+import backend
+from backend import app
 
 class MyApp(Adw.Application):
 	def __init__(self, **kwargs):
@@ -17,21 +19,6 @@ class MyApp(Adw.Application):
 		self.win = window(application = app)
 		self.win.present()
 	
-
-
-app2=MyApp(application_id='org.Unicorn.Organizer')
+app.checkValidConfig()
+app2=MyApp(application_id='org.Unicorn.organizer')
 app2.run(sys.argv)
-
-	
-#click Ticket to open details in side window Detail Window
-	#close button
-	#change position
-	#show infos(title, topic, description etc...)
-	#show Ticket id?
-	#add comments
-	#edit previously entered values
-	#Button to delete Ticket
-#setting for topic and choose them via dropdown
-#delete old Tickets(maybe only on startup?)
-	#dont really delete them, make hidden files
-	#setting when to delete

@@ -1,0 +1,65 @@
+app-id: io.github.unicorn.organizer
+runtime: org.gnome.Platform
+runtime-version: '42'
+sdk: org.gnome.Sdk
+command: run.sh
+modules:
+  - name: Organizer
+    buildsystem: simple
+    build-commands:
+      - install -D run.sh /app/bin/run.sh
+      - install -D organizer.py /app/bin/organizer.py
+      - install -D window.py /app/bin/window.py
+      - install -D more_ui.py /app/bin/more_ui.py
+      - install -D backend.py /app/bin/backend.py
+      - install -D LICENSE.txt /app/bin/LICENSE.txt
+      - install -D io.github.unicorn.organizer.desktop /app/share/applications/io.github.unicorn.organizer.desktop
+      - install -D io.github.unicorn.organizer.appdata.xml /app/share/metainfo/io.github.unicorn.organizer.appdata.xml
+      - install -D io.github.unicorn.organizer.svg /app/share/icons/io.github.unicorn.organizer.svg
+    sources:
+      - type: file
+        path: src/organizer.py
+      - type: file
+        path: src/window.py
+      - type: file
+        path: src/more_ui.py
+      - type: file
+        path: src/backend.py
+      - type: file
+        path: src/run.sh
+      - type: file
+        path: io.github.unicorn.organizer.desktop
+      - type: file
+        path: io.github.unicorn.organizer.appdata.xml
+      - type: file
+        path: io.github.unicorn.organizer.svg
+      - type: file
+        path: LICENSE.txt
+
+  - name: python3-requirements
+    buildsystem: simple
+    build-commands: []
+    modules:
+    - name: python3-xdg
+      buildsystem: simple
+      build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+        --prefix=${FLATPAK_DEST} "xdg" --no-build-isolation
+      sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/ea/09/4a0f30aada49e142b94bbb232c023abcbc6ced7e2a9776533fb14977e9db/xdg-5.1.1-py3-none-any.whl
+        sha256: 865a7b56ed1d4cd2fce2ead1eddf97360843619757f473cd90b75f1817ca541d
+
+
+finish-args:
+  # X11 + XShm access
+  - --share=ipc
+  - --socket=fallback-x11
+  # Wayland access
+  - --socket=wayland
+  - --socket=session-bus
+  # Gnome/Gtk permisiions
+  - --talk-name=org.gtk.vfs.*
+  - --filesystem=xdg-run/gvfsd
+  # Fileaccess
+  - --filesystem=home

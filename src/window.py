@@ -13,10 +13,8 @@ from more_ui import Ticket, ticketDialog, ticketDetails
 class window(Gtk.ApplicationWindow):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		
 		app3 = self.get_application()
 		sm = app3.get_style_manager()
-		sm.set_color_scheme(Adw.ColorScheme.PREFER_DARK)
 		
 		self.spacing = 10
 		
@@ -74,17 +72,18 @@ class window(Gtk.ApplicationWindow):
 		#Hamburger Menu
 		#Popover and Button
 		self.popover = Gtk.Popover(position = Gtk.PositionType.BOTTOM)
-		self.menuButton = Gtk.MenuButton(popover=self.popover)
+		self.menuButton = Gtk.MenuButton(popover=self.popover, icon_name = "open-menu-symbolic", primary = True)
 		self.headerBar.pack_end(self.menuButton)
 		#add a box to the Menu
 		self.menuBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=self.spacing)
 		self.popover.set_child(self.menuBox)
 		#add Menu Items 
-		self.folderChooser = Gtk.Button(label = 'Select Board')
-		#self.folderIcon = Gtk.Image.new_from_icon_name('folder-open-symbolic')
-		#self.folderChooser.set_child(self.folderIcon)
+		self.folderChooser = Gtk.Button(label = 'Select Board', has_frame = False)
 		self.folderChooser.connect('clicked', self.folderClicked)
 		self.menuBox.append(self.folderChooser)
+		self.about = Gtk.Button(label = 'About', has_frame = False)
+		self.about.connect('clicked', self.aboutClicked)
+		self.menuBox.append(self.about)
 
 		
 		#Ticket Boxes
@@ -158,7 +157,26 @@ class window(Gtk.ApplicationWindow):
 		self.category = widget.get_active_text()
 		self.ticket = widget.get_parent().get_parent().get_parent()
 		app.editTicket(self.ticket.get_name(), 'Position', self.category)
-		self.reloadTickets()
+		if self.ticket.get_parent().get_parent() == self.ticketBox:
+			self.ticket.get_parent().remove(self.ticket)
+			if self.category == "Idea":
+				self.idea.append(self.ticket)
+			elif self.category == "To Do":
+				self.todo.append(self.ticket)
+			elif self.category == "Doing":
+				self.doing.append(self.ticket)
+			elif self.category == "Stopped":
+				self.stopped.append(self.ticket)
+			elif self.category == "Done":
+				self.done.append(self.ticket)
+			for section in self.mainBox:
+				if section == self.detailScroll:
+					for child in self.detailBox:
+						if child.get_name() == self.ticket.get_name():
+							self.closeDetails(child.get_first_child().get_first_child().get_first_child())
+							self.openDetails(self.ticket.get_first_child().get_first_child().get_first_child())
+		else:
+			self.reloadTickets()
 		
 	#opens dialog to choose folder to look in
 	def folderClicked(self, widget):
@@ -170,9 +188,10 @@ class window(Gtk.ApplicationWindow):
 	def on_dialog_response(self, widget, response_id):
 		if response_id == Gtk.ResponseType.OK:
 			app.setConfig('Location of Tickets', widget.get_file().get_path())
+			self.reloadTickets()
 		widget.destroy()
-		
-		
+
+
 	def getTickets(self):
 		files = app.getTickets()
 		for file in files:
@@ -195,7 +214,7 @@ class window(Gtk.ApplicationWindow):
 				self.done.append(self.newticket.frame)
 			self.newticket.status.connect('changed', self.moveTicket)
 			self.newticket.titleButton.connect('clicked', self.openDetails)
-			
+
 			
 	def reloadTickets(self):
 		while self.idea.get_first_child():
@@ -222,3 +241,8 @@ class window(Gtk.ApplicationWindow):
 			app.createTicket(widget.title.get_text(), widget.topic.get_text(), widget.effort.get_text(), widget.priority.get_text(), desc)
 			self.reloadTickets()
 		widget.destroy()
+
+	def aboutClicked(self, widget):
+		self.dialog = Gtk.AboutDialog(authors = ['Unicorn'], artists= ['Unicorn'], comments = 'Organize your work in a local and agile kanban board.', license_type = Gtk.License.GPL_3_0_ONLY, program_name = 'Organizer', version = '1.0.0', website_label = 'Github', website = 'https://github.com/UnicornyRainbow/Organizer')
+		self.dialog.set_logo_icon_name('organizer')
+		self.dialog.show()

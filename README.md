@@ -1,6 +1,3 @@
 # KBoard
-A Simple Kanban Board
-
-## **Warning!!!**
-This program is currentlz in Development and not ready to use, u maz be able to run it, but it's not functional.
-Currently only intended for development purposes.
+A simple Kanban inspired board.
+Written in Python and using GTK 4 and Libadwaita 1.

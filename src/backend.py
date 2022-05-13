@@ -2,10 +2,25 @@
 
 import os
 import datetime
+import xdg
+import threading
+from datetime import datetime
 
 
 class app():
-	
+
+	def checkValidConfig():
+		try:
+			if os.path.exists(app.readConfig('Location of Tickets')):
+				return
+			else:
+				app.setConfig('Location of Tickets', os.path.expanduser('~'))
+		except Exception as e:
+			if type(e) == FileNotFoundError:
+				with open((xdg.xdg_config_home().__str__()+'/organizer.config'), "a+") as file:
+					file.write(
+						"Location of Tickets: /home/unicorn/Documents/tickets")
+
 	#creates a new Ticket
 	def createTicket(title='', topic='', effort='', priority='', description='', comments=''):
 		description = description.replace('\n', '\\n')
@@ -16,13 +31,14 @@ class app():
 			for entry in content:
 				ticket.write(entry + ': ' + content[entry] + '\n')
 		
-		
+
 	#gets all the files in the current directory
 	def getTickets():
 		path = app.readConfig('Location of Tickets')
 		fileList = []
 		with os.scandir(path) as dirs:
 			for entry in dirs:
+				start = datetime.now()
 				if entry.is_file():					#hides folders
 					if entry.name.endswith('.ticket') and not entry.name.startswith('.'):
 						fileList.append(entry.name)
@@ -54,7 +70,7 @@ class app():
 			for settings in allSettings:
 				ticket.write(': '.join(settings) + '\n')
 
-	#needed to edit ticket
+	#needed to edit ticket because dict cant be iterated
 	def readTicket(file):
 		allSettings = []
 		with open(app.readConfig('Location of Tickets')+'/'+file, 'r') as ticket:
@@ -74,7 +90,7 @@ class app():
 		for settings in allSettings:
 			if settings[0] == setting:
 				settings[1] = content
-		with open(os.path.dirname(__file__)+'/organizer.config', 'w') as config:
+		with open(xdg.xdg_config_home().__str__()+'/organizer.config', 'w') as config:
 			for settings in allSettings:
 				config.write(': '.join(settings) + '\n')
 			
@@ -82,7 +98,7 @@ class app():
 	#reads the config
 	def readConfig(setting):
 		allSettings = []
-		with open(os.path.dirname(__file__)+'/organizer.config', 'r') as config:
+		with open(xdg.xdg_config_home().__str__()+'/organizer.config', 'r') as config:
 			for line in config:
 				line = line.strip('\n').split(': ')
 				if setting == 'allSettings':
