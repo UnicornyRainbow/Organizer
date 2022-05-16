@@ -64,6 +64,10 @@ class window(Gtk.ApplicationWindow):
 		self.newButton.connect('clicked', self.newTicket)
 		self.headerBar.pack_start(self.newButton)
 
+		self.boardChooser = Gtk.ComboBoxText()
+		self.addBoards()
+		self.headerBar.pack_start(self.boardChooser)
+
 		#Button to test functions
 		self.testButton = Gtk.Button(label = 'test')
 		self.testButton.connect('clicked', self.tester)
@@ -80,7 +84,7 @@ class window(Gtk.ApplicationWindow):
 		#add Menu Items 
 		self.folderChooser = Gtk.Button(label = 'Select Board', has_frame = False)
 		self.folderChooser.connect('clicked', self.folderClicked)
-		self.menuBox.append(self.folderChooser)
+		#self.menuBox.append(self.folderChooser)
 		self.about = Gtk.Button(label = 'About', has_frame = False)
 		self.about.connect('clicked', self.aboutClicked)
 		self.menuBox.append(self.about)
@@ -136,7 +140,11 @@ class window(Gtk.ApplicationWindow):
 		
 	def tester(self, widget):
 		app.editTicket('2022-02-18_07:59:12_130398.ticket', 'Topic', 'test')
-		
+	def addBoards(self):
+		boards = app.getBoards()
+		for board in boards:
+			self.boardChooser.append_text(board)
+		self.boardChooser.set_active(boards.index(app.readConfig("Current Board")))
 	
 	def closeDetails(self, widget):
 		self.detailBox.remove(widget.get_parent().get_parent().get_parent())
