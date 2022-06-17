@@ -2,5 +2,5 @@
 Name=Organizer
 Exec=run.sh
 Type=Application
-Icon=io.github.unicorn.organizer
+Icon=io.github.unicornyrainbow.organizer
 Categories=Office

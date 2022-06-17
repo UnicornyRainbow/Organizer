@@ -1,4 +1,4 @@
-app-id: io.github.unicorn.organizer
+app-id: io.github.unicornyrainbow.organizer
 runtime: org.gnome.Platform
 runtime-version: '42'
 sdk: org.gnome.Sdk
@@ -13,9 +13,9 @@ modules:
       - install -D more_ui.py /app/bin/more_ui.py
       - install -D backend.py /app/bin/backend.py
       - install -D LICENSE.txt /app/bin/LICENSE.txt
-      - install -D io.github.unicorn.organizer.desktop /app/share/applications/io.github.unicorn.organizer.desktop
-      - install -D io.github.unicorn.organizer.appdata.xml /app/share/metainfo/io.github.unicorn.organizer.appdata.xml
-      - install -D io.github.unicorn.organizer.svg /app/share/icons/io.github.unicorn.organizer.svg
+      - install -D io.github.unicornyrainbow.organizer.desktop /app/share/applications/io.github.unicornyrainbow.organizer.desktop
+      - install -D io.github.unicornyrainbow.organizer.appdata.xml /app/share/metainfo/io.github.unicornyrainbow.organizer.appdata.xml
+      - install -D io.github.unicornyrainbow.organizer.svg /app/share/icons/io.github.unicornyrainbow.organizer.svg
     sources:
       - type: file
         path: src/organizer.py
@@ -28,11 +28,11 @@ modules:
       - type: file
         path: src/run.sh
       - type: file
-        path: io.github.unicorn.organizer.desktop
+        path: io.github.unicornyrainbow.organizer.desktop
       - type: file
-        path: io.github.unicorn.organizer.appdata.xml
+        path: io.github.unicornyrainbow.organizer.appdata.xml
       - type: file
-        path: io.github.unicorn.organizer.svg
+        path: io.github.unicornyrainbow.organizer.svg
       - type: file
         path: LICENSE.txt
 
@@ -52,7 +52,7 @@ modules:
 
 
 finish-args:
-  # X11 + XShm access
+  # X11 access
   - --share=ipc
   - --socket=fallback-x11
   # Wayland access
@@ -62,4 +62,5 @@ finish-args:
   - --talk-name=org.gtk.vfs.*
   - --filesystem=xdg-run/gvfsd
   # Fileaccess
-  - --filesystem=home
+  - --filesystem=~/Documents/.tickets:create
+  - --own-name=io.github.unicornyrainbow.organizer

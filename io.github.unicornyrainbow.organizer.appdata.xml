@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.unicorn.organizer</id>
+  <id>io.github.unicornyrainbow.organizer</id>
 
   <name>Organizer</name>
   <summary>Organize your work in a local and agile kanban board</summary>
@@ -43,17 +43,20 @@
     </p>
   </description>
 
-  <launchable type="desktop-id">io.github.unicorn.Organizer.desktop</launchable>
+  <launchable type="desktop-id">io.github.unicornyrainbow.Organizer.desktop</launchable>
+
   <screenshots>
     <screenshot>
-      <image>https://i.postimg.cc/SxBKTW2w/Organizer-Screenshot.png</image>
+      <image>https://unicornyrainbow.github.io/Organizer/assets/organizer1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://unicornyrainbow.github.io/Organizer/assets/organizer2.png</image>
     </screenshot>
   </screenshots>
 
   <content_rating type="oars-1.1"/>
 
-  <url type="homepage">https://github.com/UnicornyRainbow/Organizer</url>
-  <url type="bugtracker">https://github.com/UnicornyRainbow/Organizer/issues</url>
+  <url type="homepage">https://unicornyrainbow.github.io/Organizer/</url>
 
   <releases>
     <release version="1.0" date="2022-03-29"/>

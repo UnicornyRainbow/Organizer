@@ -11,10 +11,10 @@ class app():
 
 	def checkValidConfig():
 		try:
-			if os.path.exists(xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board')):
+			if os.path.exists(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')):
 				return
-			#else:
-			#	app.setConfig('Current Board', os.path.expanduser('~'))
+			else:
+				app.setConfig('Current Board', "test")
 		except Exception as e:
 			if type(e) == FileNotFoundError:
 				with open((xdg.xdg_config_home().__str__()+'/organizer.config'), "a+") as file:
@@ -25,8 +25,8 @@ class app():
 	def createTicket(title='', topic='', effort='', priority='', description='', comments=''):
 		description = description.replace('\n', '\\n')
 		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea', 'Comments': comments}
-		id = str(datetime.datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
-		path = xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board') + '/'
+		id = str(datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
+		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board') + '/'
 		with open(path + id, 'w') as ticket:
 			for entry in content:
 				ticket.write(entry + ': ' + content[entry] + '\n')
@@ -34,7 +34,7 @@ class app():
 
 	#gets all the files in the current directory
 	def getTickets():
-		path = xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board')
+		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')
 		fileList = []
 		with os.scandir(path) as dirs:
 			for entry in dirs:
@@ -47,7 +47,7 @@ class app():
 	#reads the contents in a ticket file, good to get certain items
 	def getTicketContent(file):
 		dict={}
-		path = xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board')
+		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')
 		with open(path+'/'+file) as ticket:
 			for line in ticket:
 				line = line.strip('\n').split(': ')
@@ -66,14 +66,14 @@ class app():
 				settings[1] = content
 			if settings[0] == 'Description':
 				settings[1] = settings[1].replace('\n', '\\n')
-		with open(xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board')+'/'+file, 'w') as ticket:
+		with open(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')+'/'+file, 'w') as ticket:
 			for settings in allSettings:
 				ticket.write(': '.join(settings) + '\n')
 
 	#needed to edit ticket because dict cant be iterated
 	def readTicket(file):
 		allSettings = []
-		with open(xdg.xdg_data_home().__str__() + "/Organizer/Boards/" + app.readConfig('Current Board')+'/'+file, 'r') as ticket:
+		with open(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')+'/'+file, 'r') as ticket:
 			for line in ticket:
 				line = line.strip('\n').split(': ')
 				if len(line) > 2:
@@ -108,7 +108,7 @@ class app():
 
 	def getBoards():
 		boards = []
-		with os.scandir(xdg.xdg_data_home().__str__() + "/Organizer/Boards/") as dir:
+		with os.scandir(os.path.expanduser('~') + "/Documents/.tickets/") as dir:
 			for board in dir:
 				boards.append(board.name)
 		return(boards)

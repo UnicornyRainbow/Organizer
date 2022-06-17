@@ -66,6 +66,7 @@ class window(Gtk.ApplicationWindow):
 
 		self.boardChooser = Gtk.ComboBoxText()
 		self.addBoards()
+		self.boardChooser.connect("changed", self.boardChanged)
 		self.headerBar.pack_start(self.boardChooser)
 
 		#Button to test functions
@@ -139,7 +140,12 @@ class window(Gtk.ApplicationWindow):
 		
 		
 	def tester(self, widget):
-		app.editTicket('2022-02-18_07:59:12_130398.ticket', 'Topic', 'test')
+		pass
+
+	def boardChanged(self, widget):
+		app.setConfig("Current Board", widget.get_active_text())
+		self.reloadTickets()
+
 	def addBoards(self):
 		boards = app.getBoards()
 		for board in boards:
@@ -251,6 +257,6 @@ class window(Gtk.ApplicationWindow):
 		widget.destroy()
 
 	def aboutClicked(self, widget):
-		self.dialog = Gtk.AboutDialog(authors = ['Unicorn'], artists= ['Unicorn'], comments = 'Organize your work in a local and agile kanban board.', license_type = Gtk.License.GPL_3_0_ONLY, program_name = 'Organizer', version = '1.0.0', website_label = 'Github', website = 'https://github.com/UnicornyRainbow/Organizer')
+		self.dialog = Gtk.AboutDialog(authors = ['UnicornyRainbow'], artists= ['UnicornyRainbow'], comments = 'Organize your work in a local and agile kanban board.', license_type = Gtk.License.GPL_3_0_ONLY, program_name = 'Organizer', version = '1.0.0', website_label = 'Website', website = 'https://unicornyrainbow.github.io/Organizer/')
 		self.dialog.set_logo_icon_name('organizer')
 		self.dialog.show()
