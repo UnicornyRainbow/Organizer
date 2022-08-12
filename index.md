@@ -1,4 +1,4 @@
-# Organizer
+# Organizer a
 
 Organize your work in a local and agile kanban board, written with Python, Gtk 4 and Libadwaita.
 
