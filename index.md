@@ -1,6 +1,6 @@
 # Organizer
 
-![organizer1.png](assets/organizer1.png) ![organizer1.png](assets/organizer1.png)
+![organizer1.png](assets/organizer1.png) ![organizer2.png](assets/organizer2.png)
 
 Organize your work in a local and agile kanban board, written with Python, Gtk 4 and Libadwaita.
 
