@@ -23,7 +23,7 @@ Then open the file in your file manager and double click it, it should open your
 ### Command Line
 Download it with
 * `wget https://github.com/UnicornyRainbow/Organizer/releases/latest/download/organizer.flatpak` for x86
-* `wget https://github.com/UnicornyRainbow/Organizer/releases/latest/download/organizer_aarch.flatpak` for aarch
+* `wget https://github.com/UnicornyRainbow/Organizer/releases/latest/download/organizer_aarch.flatpak` for aarch\
 then install it
 * `sudo flatpak install organizer.flatpak` or
 * `sudo flatpak install organizer_aarch.flatpak`
