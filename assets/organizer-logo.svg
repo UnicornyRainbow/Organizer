@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <rect style="stroke: rgb(163, 0, 0); stroke-width: 0px; stroke-opacity: 0; fill: rgb(255, 255, 255); paint-order: fill; fill-rule: nonzero;" width="500" height="500.000031" rx="50" ry="50"/>
+  <rect x="46.440912" y="60.000065" width="180.000015" height="40" style="stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px; fill: rgb(135, 135, 135);"/>
+  <rect x="265.127136" y="60.000065" width="180.000015" height="40.000004" style="stroke: rgb(0, 0, 0); fill: rgb(135, 135, 135); stroke-opacity: 0; stroke-width: 0px;"/>
+  <rect style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px;" x="57.376965" y="121.048042" width="160" height="160" rx="25" ry="25"/>
+  <rect style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px;" x="57.376965" y="300" width="160" height="160" rx="25" ry="25"/>
+  <rect style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px;" x="276.474518" y="121.048042" width="160" height="160" rx="25" ry="25"/>
+  <rect x="79.999996" y="142.773972" width="119.999999" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px; fill: rgb(191, 162, 255);"/>
+  <rect x="80" y="175.505892" width="75" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-width: 0px; stroke-opacity: 0; fill: rgb(158, 242, 255);"/>
+  <rect x="79.999996" y="208.949371" width="119.99999" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(247, 154, 255);"/>
+  <rect x="79.999996" y="240.585342" width="95.768719" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(255, 154, 154);"/>
+  <rect x="300.000008" y="142.773972" width="120" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px; fill: rgb(191, 162, 255);"/>
+  <rect x="300.000015" y="175.50589" width="75" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-width: 0px; stroke-opacity: 0; fill: rgb(158, 242, 255);"/>
+  <rect x="300.000008" y="208.949371" width="119.999992" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(247, 154, 255);"/>
+  <rect x="300.000008" y="240.585342" width="95.768723" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(255, 154, 154);"/>
+  <rect x="79.999985" y="319.761124" width="120" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-opacity: 0; stroke-width: 0px; fill: rgb(191, 162, 255);"/>
+  <rect x="79.999992" y="352.493042" width="75" height="15.000001" style="stroke: rgb(0, 0, 0); stroke-width: 0px; stroke-opacity: 0; fill: rgb(158, 242, 255);"/>
+  <rect x="79.999985" y="385.936523" width="119.999992" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(247, 154, 255);"/>
+  <rect x="79.999985" y="417.572495" width="95.768723" height="14.999999" style="stroke-opacity: 0; stroke-width: 0px; stroke: rgb(221, 134, 250); fill: rgb(255, 154, 154);"/>
+</svg>
