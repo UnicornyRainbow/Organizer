@@ -18,15 +18,15 @@ modules:
       - install -D io.github.unicornyrainbow.organizer.svg /app/share/icons/io.github.unicornyrainbow.organizer.svg
     sources:
       - type: file
-        path: src/organizer.py
+        path: ../src/organizer.py
       - type: file
-        path: src/window.py
+        path: ../src/window.py
       - type: file
-        path: src/more_ui.py
+        path: ../src/more_ui.py
       - type: file
-        path: src/backend.py
+        path: ../src/backend.py
       - type: file
-        path: src/run.sh
+        path: run.sh
       - type: file
         path: io.github.unicornyrainbow.organizer.desktop
       - type: file
@@ -34,7 +34,7 @@ modules:
       - type: file
         path: io.github.unicornyrainbow.organizer.svg
       - type: file
-        path: LICENSE.txt
+        path: ../LICENSE.txt
 
   - name: python3-requirements
     buildsystem: simple
