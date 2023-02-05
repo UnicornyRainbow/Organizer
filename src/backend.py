@@ -2,113 +2,157 @@
 
 import os
 import datetime
-import xdg
-import threading
 from datetime import datetime
 
 
-class app():
+class App:
 
-	def checkValidConfig():
-		try:
-			if os.path.exists(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')):
-				return
-			else:
-				app.setConfig('Current Board', "test")
-		except Exception as e:
-			if type(e) == FileNotFoundError:
-				with open((xdg.xdg_config_home().__str__()+'/organizer.config'), "a+") as file:
-					file.write(
-						"Current Board: test")
+    @staticmethod
+    def check_valid_config():
+        if __debug__:
+            configfolder: str = "src/res"
+            ticketfolder: str = "src/res/tickets"
+        else:
+            configfolder: str = os.environ.get("XDG_CONFIG_HOME")
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        try:
+            if os.path.exists(ticketfolder + "/" + App.read_config('Current Board')):
+                return
+            else:
+                os.makedirs(ticketfolder + "/" + App.read_config('Current Board'))
+        except Exception as e:
+            if type(e) == FileNotFoundError:
+                with open((configfolder + '/organizer.config'), "w") as file:
+                    file.write("Current Board: test")
+                os.makedirs(ticketfolder + "/test")
 
-	#creates a new Ticket
-	def createTicket(title='', topic='', effort='', priority='', description='', comments=''):
-		description = description.replace('\n', '\\n')
-		content = {'Title': title, 'Topic': topic, 'Effort': effort, 'Priority': priority, 'Description': description, 'Position': 'Idea', 'Comments': comments}
-		id = str(datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
-		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board') + '/'
-		with open(path + id, 'w') as ticket:
-			for entry in content:
-				ticket.write(entry + ': ' + content[entry] + '\n')
-		
+    # gets all the files in the current directory
+    @staticmethod
+    def get_tickets():
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        path: str = ticketfolder + "/" + App.read_config('Current Board')
+        filelist: list[str] = []
+        with os.scandir(path) as dirs:
+            for entry in dirs:
+                if entry.is_file():  # hides folders
+                    if entry.name.endswith('.ticket') and not entry.name.startswith('.'):
+                        filelist.append(entry.name)
+        return filelist
 
-	#gets all the files in the current directory
-	def getTickets():
-		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')
-		fileList = []
-		with os.scandir(path) as dirs:
-			for entry in dirs:
-				start = datetime.now()
-				if entry.is_file():					#hides folders
-					if entry.name.endswith('.ticket') and not entry.name.startswith('.'):
-						fileList.append(entry.name)
-		return fileList
-	
-	#reads the contents in a ticket file, good to get certain items
-	def getTicketContent(file):
-		dict={}
-		path = os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')
-		with open(path+'/'+file) as ticket:
-			for line in ticket:
-				line = line.strip('\n').split(': ')
-				if len(line) > 2:
-					line[1] = ': '.join(line[1:])
-					del line[2:]
-				if line[0] == 'Description':
-					line[1] = line[1].replace('\\n', '\n')
-				dict[line[0]] = line[1]
-		return dict
-		
-	def editTicket(file, setting, content):
-		allSettings = app.readTicket(file)
-		for settings in allSettings:
-			if settings[0] == setting:
-				settings[1] = content
-			if settings[0] == 'Description':
-				settings[1] = settings[1].replace('\n', '\\n')
-		with open(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')+'/'+file, 'w') as ticket:
-			for settings in allSettings:
-				ticket.write(': '.join(settings) + '\n')
+    # creates a new Ticket
+    def create_ticket(title='', topic='', effort='', priority='', description='', comments=''):
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        description = description.replace('\n', '\\n')
+        contents: dict[str, str] = {'Title': title,
+                                    'Topic': topic,
+                                    'Effort': effort,
+                                    'Priority': priority,
+                                    'Description': description,
+                                    "Position": 'Idea',
+                                    'Comments': comments}
+        id: str = str(datetime.now()).replace(' ', '_').replace('.', '_') + '.ticket'
+        path: str = ticketfolder + "/" + App.read_config('Current Board') + '/'
+        with open(path + id, 'w') as ticket:
+            for entry in contents:
+                ticket.write(entry + ': ' + contents[entry] + '\n')
 
-	#needed to edit ticket because dict cant be iterated
-	def readTicket(file):
-		allSettings = []
-		with open(os.path.expanduser('~') + "/Documents/.tickets/" + app.readConfig('Current Board')+'/'+file, 'r') as ticket:
-			for line in ticket:
-				line = line.strip('\n').split(': ')
-				if len(line) > 2:
-					line[1] = ': '.join(line[1:])
-					del line[2:]
-				if line[0] == 'Description':
-					line[1] = line[1].replace('\\n', '\n')
-				allSettings.append(line)
-		return(allSettings)
-		
-	#writes the config
-	def setConfig(setting, content):
-		allSettings = app.readConfig('allSettings')
-		for settings in allSettings:
-			if settings[0] == setting:
-				settings[1] = content
-		with open(xdg.xdg_config_home().__str__()+'/organizer.config', 'w') as config:
-			for settings in allSettings:
-				config.write(': '.join(settings) + '\n')
-				
-	#reads the config
-	def readConfig(setting):
-		allSettings = []
-		with open(xdg.xdg_config_home().__str__()+'/organizer.config', 'r') as config:
-			for line in config:
-				line = line.strip('\n').split(': ')
-				if setting == 'allSettings':
-					allSettings.append(line)
-				elif line[0] == setting:
-					return(line[1])
-		return(allSettings)
+    # reads the contents in a ticket file, good to get certain items
+    def get_ticket_content(file: str):
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        contents: dict[str, str] = {}
+        path: str = ticketfolder + "/" + App.read_config('Current Board') + '/'
+        with open(path + file) as ticket:
+            for line in ticket:
+                line = line.strip('\n').split(': ')
+                if len(line) > 2:
+                    content = ': '.join(line[1:])
+                else:
+                    content = line[1]
+                if line[0] == 'Description':
+                    content = line[1].replace('\\n', '\n')
+                contents[line[0]] = content
+        return contents
 
-	def getBoards():
-		boards = []
-		with os.scandir(os.path.expanduser('~') + "/Documents/.tickets/") as dir:
-			for board in dir:
-				boards.append(board.name)
-		return(boards)
+    def edit_ticket(file: str, setting: str, content: str):
+        allsettings = App.read_ticket(file)
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        for settings in allsettings:
+            if settings[0] == setting:
+                settings[1] = content
+            if settings[0] == 'Description':
+                settings[1] = settings[1].replace('\n', '\\n')
+        with open(ticketfolder + "/" + App.read_config('Current Board') + '/' + file, 'w') as ticket:
+            for settings in allsettings:
+                ticket.write(': '.join(settings) + '\n')
+
+    # needed to edit ticket because dict cant be iterated
+    def read_ticket(file: str):
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        allsettings: list[list[str]] = []
+        with open(ticketfolder + "/" + App.read_config('Current Board') + '/' + file, 'r') as ticket:
+            for line in ticket:
+                line = line.strip('\n').split(': ')
+                if len(line) > 2:
+                    line[1] = ': '.join(line[1:])
+                    del line[2:]
+                if line[0] == 'Description':
+                    line[1] = line[1].replace('\\n', '\n')
+                allsettings.append(line)
+        return allsettings
+
+    # writes the config
+    def set_config(setting: str, content: str):
+        if __debug__:
+            configfolder: str = "src/res"
+        else:
+            configfolder: str = os.environ.get("XDG_CONFIG_HOME")
+        allsettings: list[list[str]] = App.read_config('allSettings')
+        for settings in allsettings:
+            if settings[0] == setting:
+                settings[1] = content
+        with open(configfolder + '/organizer.config', 'w') as config:
+            for settings in allsettings:
+                config.write(': '.join(settings) + '\n')
+
+    # reads the config
+    def read_config(setting: str):
+        if __debug__:
+            configfolder: str = "src/res"
+        else:
+            configfolder: str = os.environ.get("XDG_CONFIG_HOME")
+        allsettings: list[list[str]] = []
+        with open(configfolder + '/organizer.config', 'r') as config:
+            for line in config:
+                contents = line.strip('\n').split(': ')
+                if setting == 'allSettings':
+                    allsettings.append(contents)
+                elif contents[0] == setting:
+                    return contents[1]
+        return allsettings
+
+    @staticmethod
+    def get_boards():
+        boards: list[str] = []
+        if __debug__:
+            ticketfolder: str = "src/res/tickets"
+        else:
+            ticketfolder: str = os.environ.get("XDG_DATA_HOME") + "/tickets"
+        with os.scandir(ticketfolder) as dir:
+            for board in dir:
+                boards.append(board.name)
+        return boards
