@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 /app/bin/organizer.py
+python3 -vO /app/bin/organizer.py

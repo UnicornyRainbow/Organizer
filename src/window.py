@@ -1,4 +1,18 @@
-#!/usr/bin/env python3
+# Organizer
+#     Copyright (C) 2023  UnicornyRainbow
+#
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import gi
 
@@ -10,10 +24,14 @@ from gi.repository import Gtk, Adw
 from backend import App
 from more_ui import Ticket, TicketDialog, TicketDetails
 
+if __debug__:
+    uipath = "src/res/organizer.ui"
+else:
+    uipath = "/app/bin/organizer.ui"
 
 
-@Gtk.Template(filename="src/res/organizer.ui")
-class MainWindow(Adw.Window):
+@Gtk.Template(filename=uipath)
+class MainWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MainWindow"
 
     mainBox: Gtk.Box = Gtk.Template.Child()
@@ -131,7 +149,7 @@ class MainWindow(Adw.Window):
     # creates new Ticket
     @Gtk.Template.Callback()
     def new_ticket(self, widget: Gtk.Button):
-        dialog = ""#TicketDialog(self)
+        dialog = TicketDialog(self)
         dialog.connect('response', self.on_ticket_response)
 
     def on_ticket_response(self, widget, responseid):
