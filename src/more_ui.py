@@ -19,9 +19,8 @@
 import gi
 
 gi.require_version('Gtk', '4.0')
-gi.require_version('Adw', '1')
 
-from gi.repository import Gtk, Adw
+from gi.repository import Gtk
 
 from backend import App
 
@@ -181,29 +180,3 @@ class TicketDetails(Gtk.ApplicationWindow):
 			if item != '':
 				self.comment = Comment(item)
 				self.commentbox.prepend(self.comment.frame)
-
-
-class TicketDialog(Gtk.Dialog):
-	def __init__(self, parent):
-		Gtk.Dialog.__init__(self)
-		self.set_transient_for(parent)
-		self.set_default_size(300, 400)
-		self.set_modal(True)
-		self.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Create', Gtk.ResponseType.OK)
-		self.content: Gtk.Box = self.get_content_area()
-		self.contentbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5, hexpand=True, vexpand=True, margin_top=5, margin_start=5, margin_end=5)
-		self.content.append(self.contentbox)
-		self.title = Gtk.Entry(placeholder_text='Title')
-		self.contentbox.append(self.title)
-		self.topic = Gtk.Entry(placeholder_text='Topic')
-		self.contentbox.append(self.topic)
-		self.effort = Gtk.Entry(placeholder_text='Estimated Effort')
-		self.contentbox.append(self.effort)
-		self.priority = Gtk.Entry(placeholder_text='Priority')
-		self.contentbox.append(self.priority)
-		self.frame = Gtk.Frame()
-		self.description = Gtk.TextView(vexpand=True, left_margin=5, right_margin=5, accepts_tab=False)
-		self.description.set_wrap_mode(2)
-		self.frame.set_child(self.description)
-		self.contentbox.append(self.frame)
-		self.show()

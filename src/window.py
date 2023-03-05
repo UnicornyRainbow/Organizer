@@ -22,7 +22,7 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw
 
 from backend import App
-from more_ui import Ticket, TicketDialog, TicketDetails
+from more_ui import Ticket, TicketDetails
 
 if __debug__:
     uipath = "src/res/organizer.ui"
@@ -37,6 +37,12 @@ class MainWindow(Adw.ApplicationWindow):
     mainBox: Gtk.Box = Gtk.Template.Child()
     popover: Gtk.Popover = Gtk.Template.Child()
     popoverBox: Gtk.Box = Gtk.Template.Child()
+    newTicketFlap: Adw.Flap = Gtk.Template.Child()
+    title: Gtk.Entry = Gtk.Template.Child()
+    topic: Gtk.Entry = Gtk.Template.Child()
+    effort: Gtk.Entry = Gtk.Template.Child()
+    priority: Gtk.Entry = Gtk.Template.Child()
+    description: Gtk.TextView = Gtk.Template.Child()
     bigbox: Gtk.Box = Gtk.Template.Child()
     ticketscroll: Gtk.Box = Gtk.Template.Child()
     ticketbox: Gtk.Box = Gtk.Template.Child()
@@ -149,8 +155,25 @@ class MainWindow(Adw.ApplicationWindow):
     # creates new Ticket
     @Gtk.Template.Callback()
     def new_ticket(self, widget: Gtk.Button):
-        dialog = TicketDialog(self)
-        dialog.connect('response', self.on_ticket_response)
+        self.newTicketFlap.set_reveal_flap(not self.newTicketFlap.get_reveal_flap())
+        self.title.set_text("")
+        self.topic.set_text("")
+        self.effort.set_text("")
+        self.priority.set_text("")
+        self.description.set_buffer(Gtk.TextBuffer())
+
+    @Gtk.Template.Callback()
+    def create_ticket_clicked(self, widget: Gtk.Button):
+        desc = self.description.get_buffer().get_text(self.description.get_buffer().get_start_iter(),
+                                                            self.description.get_buffer().get_end_iter(), False)
+        App.create_ticket(self.title.get_text(), self.topic.get_text(), self.effort.get_text(), self.priority.get_text(), desc)
+        self.newTicketFlap.set_reveal_flap(False)
+        self.title.set_text("")
+        self.topic.set_text("")
+        self.effort.set_text("")
+        self.priority.set_text("")
+        self.description.set_buffer(Gtk.TextBuffer())
+        self.reload_tickets()
 
     def on_ticket_response(self, widget, responseid):
         if responseid == Gtk.ResponseType.OK:
